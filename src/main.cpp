@@ -3,6 +3,23 @@
 
 using namespace std;
 
+int buildFrequencyTable(const string& filename, int freq[256]){
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return 1;
+    }
+
+    unsigned char byte;
+
+    while (file.read(reinterpret_cast<char*>(&byte), 1)) {
+        freq[byte]++;
+    }
+
+    return 0;
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 4) {
@@ -30,21 +47,3 @@ int main(int argc, char* argv[])
 
 
 }
-
-int readFileRawBytes(const string& filename, string& data) {
-    std::ifstream file(filename, std::ios::binary);
-
-    if (!file) {
-        std::cerr << "Error opening file: " << filename << std::endl;
-        return 1;
-    }
-
-    unsigned char byte;
-
-    while (file.read(reinterpret_cast<char*>(&byte), 1)) {
-        data.push_back(byte);
-    }
-
-    return 0;
-}
-
