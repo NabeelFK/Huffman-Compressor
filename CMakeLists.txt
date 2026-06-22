@@ -17,6 +17,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_executable(huff
     src/main.cpp
+    src/frequency.cpp
+    src/huffman_tree.cpp
 )
 
 target_include_directories(huff PRIVATE include)

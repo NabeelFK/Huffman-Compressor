@@ -1,5 +1,6 @@
 #include <iostream>
 #include "frequency.hpp"
+#include "huffman_tree.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -11,31 +12,31 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    string command = argv[1];
-    string input_file = argv[2];
-    string output_file = argv[3];
+    std::string command = argv[1];
+    std::string input_file = argv[2];
+    std::string output_file = argv[3];
 
     if (command == "compress")
     {
-        cout << "Compressing " << input_file << " to " << output_file << "\n";
-        // int freq[256] = {0};
-        // buildFrequencyTable(input_file, freq);
+        std::cout << "Compressing " << input_file << " to " << output_file << "\n";
+        
+        int freq[256] = {0};
 
-        // for (int i = 0; i < 256; i++) {
-        //     if (freq[i] > 0) {
-        //         cout << i << " : " << freq[i] << endl;
-        //     }
-        // }
-        return 0;
+        if (buildFrequencyTable(input_file, freq) != 0) {
+            return 1;
+        }
+
+        Node* root = buildHuffmanTree(freq);
+
     }
     else if (command == "decompress")
     {
-        cout << "Decompressing " << input_file << " to " << output_file << "\n";
+        std::cout << "Decompressing " << input_file << " to " << output_file << "\n";
         return 0;
     }
     else
     {
-        cout << "Unknown command: " << command << "\n";
+        std::cout << "Unknown command: " << command << "\n";
         return 1;
     }
 }
