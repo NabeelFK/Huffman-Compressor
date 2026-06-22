@@ -1,15 +1,13 @@
 #include <iostream>
 #include "frequency.hpp"
 
-using namespace std; 
-
 int main(int argc, char *argv[])
 {
     if (argc < 4)
     {
-        cout << "\nUsage:\n";
-        cout << "huff compress <input_file> <output_file>\n";
-        cout << "huff decompress <input_file> <output_file>\n\n";
+        std::cout << "\nUsage:\n";
+        std::cout << "huff compress <input_file> <output_file>\n";
+        std::cout << "huff decompress <input_file> <output_file>\n\n";
         return 1;
     }
 
