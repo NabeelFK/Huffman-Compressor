@@ -1,8 +1,17 @@
 #include <iostream>
 #include <stdlib.h>
+
 #include <vector>
+#include <queue>
 
 #include "huffman_tree.hpp"
+
+
+struct compareNodes {
+    bool operator()(Node* a, Node* b) {
+        return a->frequency > b->frequency;
+    }
+};
 
 
 // Leaf Node Constructor
@@ -38,19 +47,41 @@ bool Node::isLeaf() const {
 
 Node* buildHuffmanTree(int freq[256]) {
 
-    std::vector<Node*> leafNodes = {};
+    std::priority_queue<
+        Node*,
+        std::vector<Node*>,
+        compareNodes
+    > pq;
 
     for (int i = 0; i < 256; i++) {
         if (freq[i] > 0) {
             Node* newLeaf = new Node(static_cast<unsigned char>(i), freq[i]);
-            leafNodes.push_back(newLeaf);
+            pq.push(newLeaf);
             std::cout << "Created leaf: "
                         << static_cast<int>(newLeaf->byte)
                         << " Frequency: "
                         << newLeaf->frequency
                         << std::endl;
         }
+
     }
 
-    return nullptr;
+    if (pq.empty()) {
+        return nullptr;
+    }
+
+    while (pq.size() > 1) {
+
+        Node* smallest = pq.top();
+        pq.pop();
+
+        Node* secondSmallest = pq.top();
+        pq.pop();
+
+        Node* newInternal = new Node(smallest, secondSmallest);
+        pq.push(newInternal);
+
+    }
+
+    return pq.top();
 }
