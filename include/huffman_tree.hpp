@@ -17,3 +17,5 @@ struct Node {
 };
 
 Node* buildHuffmanTree(int freq[256]);
+
+void deleteTree(Node* root);

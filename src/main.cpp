@@ -53,20 +53,12 @@ int main(int argc, char *argv[])
         );
 
         std::cout << "Compression Complete" << std::endl;
+
+        deleteTree(root);
     }
     else if (command == "decompress")
     {
         std::cout << "Decompressing " << input_file << " to " << output_file << "\n";
-
-        int freq[256] = {0};
-
-        if (buildFrequencyTable(input_file, freq) != 0) {
-            return 1;
-        }
-
-        Node* root = buildHuffmanTree(freq);
-
-        CodeTable codes = generateCodes(root);
 
         decompress(
             input_file,

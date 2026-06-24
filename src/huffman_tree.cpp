@@ -85,3 +85,14 @@ Node* buildHuffmanTree(int freq[256]) {
 
     return pq.top();
 }
+
+void deleteTree(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+
+    deleteTree(root->left);
+    deleteTree(root->right);
+
+    delete root;
+}

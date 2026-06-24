@@ -46,6 +46,7 @@ void decompress(
         for (int i = 0; i < freq[root->byte]; ++i) {
             output.write(reinterpret_cast<const char *>(&root->byte), sizeof(root->byte));
         }
+        deleteTree(root);
         return;
     }
 
@@ -60,6 +61,7 @@ void decompress(
             int bit = byte >> (7 - i) & 1;
 
             if (bitsProcessed >= totalBits) {
+                deleteTree(root);
                 return;
             }
 
@@ -79,6 +81,6 @@ void decompress(
             }
 
         }
-
     }
+    deleteTree(root);
 }
