@@ -19,6 +19,8 @@ add_executable(huff
     src/main.cpp
     src/frequency.cpp
     src/huffman_tree.cpp
+    src/huffman_codes.cpp
+    src/encoder.cpp
 )
 
 target_include_directories(huff PRIVATE include)

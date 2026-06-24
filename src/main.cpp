@@ -1,6 +1,8 @@
 #include <iostream>
 #include "frequency.hpp"
 #include "huffman_tree.hpp"
+#include "huffman_codes.hpp"
+#include "encoder.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +30,26 @@ int main(int argc, char *argv[])
 
         Node* root = buildHuffmanTree(freq);
 
+        CodeTable codes = generateCodes(root);
+
+        std::cout << "\nGenerated Huffman Codes:\n";
+
+        for (int i = 0; i < 256; i++) {
+            if (!codes[i].empty()) {
+                std::cout
+                << static_cast<char>(i)
+                << " -> "
+                << codes[i]
+                << std::endl;
+            }
+        }
+
+        compress(
+            codes,
+            freq,
+            input_file,
+            output_file
+        );
     }
     else if (command == "decompress")
     {
