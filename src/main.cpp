@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
     if (command == "compress")
     {
-        std::cout << "Compressing " << input_file << " to " << output_file << "\n";
+        std::cout << "\nCompressing " << input_file << " to " << output_file << "\n";
         
         int freq[256] = {0};
 
@@ -33,18 +33,6 @@ int main(int argc, char *argv[])
 
         CodeTable codes = generateCodes(root);
 
-        std::cout << "\nGenerated Huffman Codes:\n";
-
-        for (int i = 0; i < 256; i++) {
-            if (!codes[i].empty()) {
-                std::cout
-                << static_cast<char>(i)
-                << " -> "
-                << codes[i]
-                << std::endl;
-            }
-        }
-
         compress(
             codes,
             freq,
@@ -52,18 +40,20 @@ int main(int argc, char *argv[])
             output_file
         );
 
-        std::cout << "Compression Complete" << std::endl;
+        std::cout << "Compression Complete.\n" << std::endl;
 
         deleteTree(root);
     }
     else if (command == "decompress")
     {
-        std::cout << "Decompressing " << input_file << " to " << output_file << "\n";
+        std::cout << "\nDecompressing " << input_file << " to " << output_file << "\n";
 
         decompress(
             input_file,
             output_file
         );
+
+        std::cout << "Decompression complete.\n" << std::endl;
     }
     else
     {

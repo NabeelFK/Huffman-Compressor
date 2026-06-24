@@ -57,11 +57,6 @@ Node* buildHuffmanTree(int freq[256]) {
         if (freq[i] > 0) {
             Node* newLeaf = new Node(static_cast<unsigned char>(i), freq[i]);
             pq.push(newLeaf);
-            std::cout << "Created leaf: "
-                        << static_cast<int>(newLeaf->byte)
-                        << " Frequency: "
-                        << newLeaf->frequency
-                        << std::endl;
         }
 
     }
