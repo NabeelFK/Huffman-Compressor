@@ -30,6 +30,21 @@ void compress(
         totalBitCount += freq[i] * codeTable[i].length();
     }
 
+    // Adds extension type and length to header
+    size_t dotPos = fileInput.find_last_of('.');
+    std::string extension;
+
+    if (dotPos == std::string::npos) {
+        extension = "";
+    } else {
+        extension = fileInput.substr(dotPos + 1);
+    }
+
+    size_t extensionLen = extension.length();
+
+    output.write(reinterpret_cast<const char*>(&extensionLen), sizeof(extensionLen));
+    output.write(extension.c_str(), extensionLen);
+
     // Add header to output file for decomp
     for (int i = 0; i < 256; ++i) {
         output.write(reinterpret_cast<const char*>(&freq[i]), sizeof(int));

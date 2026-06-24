@@ -4,6 +4,32 @@
 
 #include "huffman_tree.hpp"
 
+std::string getStoredExtension(
+    const std::string &fileInput
+) {
+    std::ifstream input(fileInput, std::ios::binary);
+
+    if (!input) {
+        std::cerr << "Error opening file: " << fileInput << std::endl;
+        return "";
+    }
+
+    size_t extensionLen;
+
+    // Read extension length
+    input.read(reinterpret_cast<char *>(&extensionLen), sizeof(extensionLen));
+
+    std::string extension(extensionLen, '\0');
+
+    // Read extension type
+    if (extensionLen > 0) {
+        input.read(&extension[0], extensionLen);
+    }
+
+    return extension;
+
+}
+
 void decompress(
     const std::string &fileInput,
     const std::string &fileOutput
@@ -25,6 +51,21 @@ void decompress(
     std::size_t totalBits = 0;
 
     int freq[256] = {0};
+
+    size_t extensionLen;
+
+    // Read extension length
+    input.read(
+        reinterpret_cast<char*>(&extensionLen),
+        sizeof(extensionLen)
+    );
+
+    std::string extension(extensionLen, '\0');
+
+    // Read extension
+    if (extensionLen > 0) {
+        input.read(&extension[0], extensionLen);
+    }
 
     // Read frequencies of all bits in compressed file
     for (int i = 0; i < 256; ++i) {

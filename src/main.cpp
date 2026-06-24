@@ -1,4 +1,6 @@
 #include <iostream>
+#include <filesystem>
+
 #include "frequency.hpp"
 #include "huffman_tree.hpp"
 #include "huffman_codes.hpp"
@@ -7,17 +9,30 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 3)
     {
         std::cout << "\nUsage:\n";
-        std::cout << "huff compress <input_file> <output_file>\n";
-        std::cout << "huff decompress <input_file> <output_file>\n\n";
+        std::cout << "huff compress <input_file> optional:<output_file>\n";
+        std::cout << "huff decompress <input_file> optional:<output_file>\n\n";
         return 1;
     }
 
     std::string command = argv[1];
     std::string input_file = argv[2];
-    std::string output_file = argv[3];
+    std::string output_file = "";
+    if (argc >= 4) {
+        output_file = argv[3];
+    } else if (command == "compress") {
+        output_file = "compressed.huff";
+    } else {
+        std::string extension = getStoredExtension(input_file);
+
+        output_file = "decompressed";
+
+        if (!extension.empty()) {
+            output_file += "." + extension;
+        }
+    }
 
     if (command == "compress")
     {
