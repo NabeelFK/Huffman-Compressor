@@ -22,10 +22,20 @@ void compress(
         return;
     }
 
+    // Total bit count
+    std::size_t totalBitCount = 0;
+
+    // Calculate total bits in file
+    for (int i = 0; i < 256; ++i) {
+        totalBitCount += freq[i] * codeTable[i].length();
+    }
+
     // Add header to output file for decomp
     for (int i = 0; i < 256; ++i) {
         output.write(reinterpret_cast<const char*>(&freq[i]), sizeof(int));
     }
+
+    output.write(reinterpret_cast<const char*>(&totalBitCount), sizeof(totalBitCount));
 
     
     // Current byte read from input file

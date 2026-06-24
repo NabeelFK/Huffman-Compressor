@@ -3,6 +3,7 @@
 #include "huffman_tree.hpp"
 #include "huffman_codes.hpp"
 #include "encoder.hpp"
+#include "decoder.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -50,11 +51,27 @@ int main(int argc, char *argv[])
             input_file,
             output_file
         );
+
+        std::cout << "Compression Complete" << std::endl;
     }
     else if (command == "decompress")
     {
         std::cout << "Decompressing " << input_file << " to " << output_file << "\n";
-        return 0;
+
+        int freq[256] = {0};
+
+        if (buildFrequencyTable(input_file, freq) != 0) {
+            return 1;
+        }
+
+        Node* root = buildHuffmanTree(freq);
+
+        CodeTable codes = generateCodes(root);
+
+        decompress(
+            input_file,
+            output_file
+        );
     }
     else
     {

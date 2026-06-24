@@ -21,6 +21,7 @@ add_executable(huff
     src/huffman_tree.cpp
     src/huffman_codes.cpp
     src/encoder.cpp
+    src/decoder.cpp
 )
 
 target_include_directories(huff PRIVATE include)
