@@ -37,6 +37,18 @@ void decompress(
     // Rebuild the tree for decoding
     Node* root = buildHuffmanTree(freq);
 
+    if (root == nullptr) {
+        return;
+    }
+
+    // Handle edgecase if only 1 char type is in the decompressed file
+    if (root->isLeaf()) {
+        for (int i = 0; i < freq[root->byte]; ++i) {
+            output.write(reinterpret_cast<const char *>(&root->byte), sizeof(root->byte));
+        }
+        return;
+    }
+
     Node* currentNode = root;
     std::size_t bitsProcessed = 0;
 
