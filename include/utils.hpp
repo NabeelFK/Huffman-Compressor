@@ -14,3 +14,8 @@ std::string formatFileSize(
 std::string getStoredExtension (
     const std::string &fileInput
 );
+
+std::string getAvailableFileName(
+    const std::string &baseName,
+    const std::string &extension
+);

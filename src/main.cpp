@@ -24,18 +24,20 @@ int main(int argc, char *argv[])
     }
     else if (command == "compress")
     {
-        output_file = "compressed.huff";
+        output_file = getAvailableFileName(
+            "compressed",
+            "huff"
+        );
     }
     else
     {
         std::string extension = getStoredExtension(input_file);
 
-        output_file = "decompressed";
+        output_file = getAvailableFileName(
+            "decompressed",
+            extension
+        );
 
-        if (!extension.empty())
-        {
-            output_file += "." + extension;
-        }
     }
 
     if (command == "compress")

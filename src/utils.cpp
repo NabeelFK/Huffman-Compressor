@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+#include <filesystem>
 
 
 std::string getFileExtension(
@@ -70,4 +71,35 @@ std::string getStoredExtension(
 
     return extension;
 
+}
+
+std::string getAvailableFileName(
+    const std::string &baseName,
+    const std::string &extension
+) {
+    std::string fileName = baseName;
+
+    if (!extension.empty()) {
+        fileName += "." + extension;
+    }
+
+    if (!std::filesystem::exists(fileName)) {
+        return fileName;
+    }
+
+    std::size_t counter = 1;
+
+    while (true) {
+        fileName = baseName + std::to_string(counter);
+
+        if (!extension.empty()) {
+            fileName += "." + extension;
+        }
+
+        if (!std::filesystem::exists(fileName)) {
+            return fileName;
+        }
+
+        counter++;
+    }
 }
