@@ -1,38 +1,9 @@
 #include <iostream>
-#include <filesystem>
 #include <iomanip>
-#include <sstream>
 
-#include "frequency.hpp"
-#include "huffman_tree.hpp"
-#include "huffman_codes.hpp"
-#include "encoder.hpp"
 #include "decoder.hpp"
-
-// Helper to format to more readable file and header sizes 
-std::string formatFileSize(std::uintmax_t bytes)
-{
-
-    std::ostringstream output;
-
-    if (bytes >= 1024 * 1024)
-    {
-        output << std::fixed << std::setprecision(2)
-               << static_cast<double>(bytes) / (1024.0 * 1024.0)
-               << " MB";
-    }
-    else if (bytes >= 1024)
-    {
-        output << std::fixed << std::setprecision(2)
-               << static_cast<double>(bytes) / 1024.0 << " KB";
-    }
-    else
-    {
-        output << bytes << " bytes";
-    }
-
-    return output.str();
-}
+#include "compressor.hpp"
+#include "utils.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -71,54 +42,10 @@ int main(int argc, char *argv[])
     {
         std::cout << "\nCompressing " << input_file << " to " << output_file << "\n";
 
-        int freq[256] = {0};
+        CompressionStats stats = runCompression(input_file, output_file);
 
-        if (buildFrequencyTable(input_file, freq) != 0)
-        {
+        if (!stats.success) {
             return 1;
-        }
-
-        Node *root = buildHuffmanTree(freq);
-
-        CodeTable codes = generateCodes(root);
-
-        compress(
-            codes,
-            freq,
-            input_file,
-            output_file);
-
-        std::uintmax_t originalSize = std::filesystem::file_size(input_file);
-
-        std::uintmax_t compressedSize = std::filesystem::file_size(output_file);
-
-        size_t dotPos = input_file.find_last_of('.');
-
-        std::string extension;
-
-        if (dotPos == std::string::npos)
-        {
-            extension = "";
-        }
-        else
-        {
-            extension = input_file.substr(dotPos + 1);
-        }
-
-        std::uintmax_t headerSize =
-            sizeof(size_t) +
-            extension.length() +
-            (256 * sizeof(int)) +
-            sizeof(std::size_t);
-
-        double savings = 0.0;
-
-        if (originalSize > 0)
-        {
-            savings = 100.0 *
-                      (1.0 -
-                       static_cast<double>(compressedSize) /
-                           static_cast<double>(originalSize));
         }
 
         std::cout << "\nCompression Complete.\n";
@@ -126,23 +53,22 @@ int main(int argc, char *argv[])
         std::cout << "\nCompression Statistics\n";
         std::cout << "----------------------\n";
 
-        std::cout << "Original Size:      " << formatFileSize(originalSize) << "\n";
+        std::cout << "Original Size:      " << formatFileSize(stats.originalSize) << "\n";
 
-        std::cout << "Compressed Size:    " << formatFileSize(compressedSize) << "\n";
+        std::cout << "Compressed Size:    " << formatFileSize(stats.compressedSize) << "\n";
 
-        std::cout << "Header Size:        " << formatFileSize(headerSize) << "\n";
+        std::cout << "Header Size:        " << formatFileSize(stats.headerSize) << "\n";
 
-        std::cout << "Savings: " << std::fixed << std::setprecision(2) << savings << "%\n\n";
+        std::cout << "Savings: " << std::fixed << std::setprecision(2) << stats.savings << "%\n\n";
 
-        deleteTree(root);
     }
     else if (command == "decompress")
     {
         std::cout << "\nDecompressing " << input_file << " to " << output_file << "\n";
 
-        decompress(
-            input_file,
-            output_file);
+        if (!runDecompression(input_file, output_file)) {
+            return 1;
+        }
 
         std::cout << "Decompression complete.\n"
                   << std::endl;

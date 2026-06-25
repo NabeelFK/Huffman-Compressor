@@ -4,33 +4,7 @@
 
 #include "huffman_tree.hpp"
 
-std::string getStoredExtension(
-    const std::string &fileInput
-) {
-    std::ifstream input(fileInput, std::ios::binary);
-
-    if (!input) {
-        std::cerr << "Error opening file: " << fileInput << std::endl;
-        return "";
-    }
-
-    size_t extensionLen;
-
-    // Read extension length
-    input.read(reinterpret_cast<char *>(&extensionLen), sizeof(extensionLen));
-
-    std::string extension(extensionLen, '\0');
-
-    // Read extension type
-    if (extensionLen > 0) {
-        input.read(&extension[0], extensionLen);
-    }
-
-    return extension;
-
-}
-
-void decompress(
+bool decompress(
     const std::string &fileInput,
     const std::string &fileOutput
 ) {
@@ -41,10 +15,10 @@ void decompress(
 
     if (!input) {
         std::cerr << "Error opening file: " << fileInput << std::endl;
-        return;
+        return false;
     } else if (!output) {
         std::cerr << "Error opening file: " << fileOutput << std::endl;
-        return;
+        return false;
     }
 
     unsigned char byte;
@@ -52,7 +26,7 @@ void decompress(
 
     int freq[256] = {0};
 
-    size_t extensionLen;
+    std::size_t extensionLen;
 
     // Read extension length
     input.read(
@@ -79,7 +53,7 @@ void decompress(
     Node* root = buildHuffmanTree(freq);
 
     if (root == nullptr) {
-        return;
+        return false;
     }
 
     // Handle edgecase if only 1 char type is in the decompressed file
@@ -88,7 +62,7 @@ void decompress(
             output.write(reinterpret_cast<const char *>(&root->byte), sizeof(root->byte));
         }
         deleteTree(root);
-        return;
+        return true;
     }
 
     Node* currentNode = root;
@@ -103,7 +77,7 @@ void decompress(
 
             if (bitsProcessed >= totalBits) {
                 deleteTree(root);
-                return;
+                return true;
             }
 
             // Traverse huffman tree
@@ -124,4 +98,5 @@ void decompress(
         }
     }
     deleteTree(root);
+    return true;
 }

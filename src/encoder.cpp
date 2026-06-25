@@ -3,6 +3,7 @@
 #include <string>
 
 #include "encoder.hpp"
+#include "utils.hpp"
 
 void compress(
     const CodeTable &codeTable,
@@ -31,16 +32,9 @@ void compress(
     }
 
     // Adds extension type and length to header
-    size_t dotPos = fileInput.find_last_of('.');
-    std::string extension;
+    std::string extension = getFileExtension(fileInput);
 
-    if (dotPos == std::string::npos) {
-        extension = "";
-    } else {
-        extension = fileInput.substr(dotPos + 1);
-    }
-
-    size_t extensionLen = extension.length();
+    std::size_t extensionLen = extension.length();
 
     output.write(reinterpret_cast<const char*>(&extensionLen), sizeof(extensionLen));
     output.write(extension.c_str(), extensionLen);
