@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QString>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,6 +19,14 @@ public:
     ~MainWindow() override;
 
 private:
+    void setSelectedFile(const QString &filePath);
+    void updateButtons();
+    void updateButtonStyles();
+
     Ui::MainWindow *ui;
+
+    QString inputFilePath;
+    QString outputFolderPath;
 };
+
 #endif // MAINWINDOW_H

@@ -20,6 +20,9 @@ qt_add_executable(HuffmanCompressorGUI
     ../src/decoder.cpp
     ../src/compressor.cpp
     ../src/utils.cpp
+    dropframe.h
+    dropframe.cpp
+    resources.qrc
 )
 
 target_include_directories(HuffmanCompressorGUI
