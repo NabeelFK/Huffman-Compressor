@@ -1,89 +1,400 @@
-/* ===========================
-   Global Window
-   =========================== */
+/* ==========================================================
+   Huffman Compressor
+   Modern Dark Theme (v2)
+   ========================================================== */
 
-QMainWindow {
-    background-color: #1E1E1E;
-    color: #F3F3F3;
+
+/* ==========================================================
+   Main Window
+   ========================================================== */
+
+QMainWindow
+{
+    background-color: #1F1F22;
 }
 
-/* ===========================
-   Labels
-   =========================== */
+QWidget
+{
+    background-color: transparent;
+    color: #F3F4F6;
 
-QLabel {
-    color: #F3F3F3;
     font-family: "Segoe UI";
-    font-size: 10pt;
+    font-size: 13px;
 }
 
-/* ===========================
-   Push Buttons
-   =========================== */
 
-QPushButton {
+/* ==========================================================
+   Labels
+   ========================================================== */
+
+QLabel
+{
+    color: #F3F4F6;
+}
+
+/* Drop Title */
+
+QLabel#dropTitle
+{
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+}
+
+/* Subtitle */
+
+QLabel#dropSubtitle
+{
+    color: #B6BAC2;
+    font-size: 12px;
+}
+
+/* Selected File */
+
+QLabel#selectedFileLabel
+{
+    font-size: 13px;
+    color: #F1F1F3;
+    padding: 6px 10px;
+}
+
+/* Status */
+
+QLabel#statusLabel
+{
+    color: #C7C7CC;
+    padding: 6px 10px;
+}
+
+QLabel#outputFolderLabel,
+QLabel#outputFolderPathLabel
+{
+    padding: 6px 10px;
+}
+
+/* Statistics rows (label part, e.g. "Header Size:") */
+
+QLabel#headerSizeLabel,
+QLabel#originalSizeLabel,
+QLabel#compressedSizeLabel,
+QLabel#savingsLabel
+{
+    color: #B6BAC2;
+    font-size: 12px;
+    padding: 5px 8px;
+}
+
+/* If the stat *value* labels have their own objectNames
+   (e.g. headerSizeValue / originalSizeValue / etc.),
+   give them this look so the numbers stand out: */
+
+QLabel#headerSizeValue,
+QLabel#originalSizeValue,
+QLabel#compressedSizeValue,
+QLabel#savingsValue
+{
+    color: #60A5FA;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 4px;
+}
+
+
+/* ==========================================================
+   Icons
+   (fileIcon, folderIcon, statsIcon, uploadIcon in mainwindow.ui)
+
+   These QLabels get a pixmap assigned in mainwindow.cpp. The
+   actual icon color (white on buttons, light grey on these
+   badges) is now baked into the pixmap in code, since QSS
+   can't recolor an already-rendered pixmap. This rule just
+   gives the badge itself a contrasting background/border so
+   the icon has something to sit on.
+   ========================================================== */
+
+QLabel#fileIcon,
+QLabel#folderIcon,
+QLabel#statsIcon
+{
+    background-color: #323237;
+    border: 1px solid #48484F;
+    border-radius: 7px;
+}
+
+QLabel#uploadIcon
+{
+    background-color: transparent;
+    border: none;
+}
+
+
+/* ==========================================================
+   Push Buttons
+   ========================================================== */
+
+QPushButton
+{
     background-color: #2563EB;
+
     color: white;
 
     border: none;
-    border-radius: 8px;
+    border-radius: 9px;
 
-    padding: 8px 18px;
+    padding: 10px 20px;
 
-    font-family: "Segoe UI";
-    font-size: 10pt;
+    font-size: 13px;
     font-weight: 600;
 }
 
-QPushButton:hover {
+QPushButton:hover
+{
     background-color: #3B82F6;
 }
 
-QPushButton:pressed {
+QPushButton:pressed
+{
     background-color: #1D4ED8;
 }
 
-QPushButton:disabled {
-    background-color: #3A3A3A;
-    color: #8A8A8A;
+QPushButton:disabled
+{
+    background-color: #2A2A2D;
+    color: #6B6B70;
 }
 
-/* ===========================
+
+/* ==========================================================
+   Choose File / Choose Folder Buttons
+   ========================================================== */
+
+QPushButton#browseButton,
+QPushButton#chooseFileButton,
+QPushButton#chooseFolderButton
+{
+    padding: 9px 26px;
+}
+
+/* This one shares a row with two labels, so it needs to stay
+   compact -- text was shortened to "Browse" in mainwindow.ui
+   to match. */
+
+QPushButton#browseOutputButton
+{
+    padding: 6px 14px;
+}
+
+
+/* ==========================================================
+   Read-only display fields
+   ("No file selected", "Status: Ready", "Output Folder:",
+   "Same as input folder" etc.)
+
+   IMPORTANT: these are plain QLabels in mainwindow.ui, not
+   QFrames or QLineEdits -- but in Qt, QLabel is a *subclass*
+   of QFrame. That means the generic "QFrame { ... }" rule
+   below already cascades onto every QLabel automatically,
+   which is what gives them their boxed/pill look. This
+   QLineEdit rule is kept only in case real QLineEdits are
+   added later -- it isn't what's styling the fields above.
+   ========================================================== */
+
+QLineEdit
+{
+    background-color: #2A2A2D;
+    border: 1px solid #424248;
+    border-radius: 6px;
+    padding: 4px 8px;
+    color: #E8E8EA;
+    selection-background-color: #2563EB;
+}
+
+QLineEdit:focus
+{
+    border: 1px solid #2563EB;
+}
+
+QLineEdit:disabled,
+QLineEdit:read-only
+{
+    background-color: #2A2A2D;
+    color: #B6BAC2;
+}
+
+
+/* ==========================================================
    Checkboxes
-   =========================== */
+   ========================================================== */
 
-QCheckBox {
-    color: white;
-    spacing: 8px;
+QCheckBox
+{
+    spacing: 10px;
+    color: #E5E5E5;
+    padding: 4px 0px;
 }
 
-/* ===========================
+QCheckBox::indicator
+{
+    width: 20px;
+    height: 20px;
+}
+
+QCheckBox::indicator:unchecked
+{
+    border: 2px solid #66666D;
+    border-radius: 6px;
+    background: #2A2A2D;
+}
+
+QCheckBox::indicator:unchecked:hover
+{
+    border: 2px solid #7A7A80;
+}
+
+QCheckBox::indicator:checked
+{
+    border: 2px solid #2563EB;
+    border-radius: 6px;
+    background: #2563EB;
+    image: url(:/icons/circle-check.svg);
+}
+
+
+/* ==========================================================
    Frames
-   =========================== */
+   ========================================================== */
 
-QFrame {
-    background-color: #252526;
-    border: 1px solid #3A3A3A;
+QFrame
+{
+    background-color: #2A2A2D;
+
+    border: 1px solid #424248;
+
     border-radius: 10px;
 }
 
-/* ===========================
-   Group Boxes
-   =========================== */
+/* Drop zone gets its own dashed, slightly larger look */
 
-QGroupBox {
+QFrame#dropFrame
+{
+    background-color: #232326;
+    border: 2px dashed #4B4B52;
+    border-radius: 16px;
+}
+
+QFrame#dropFrame[dragActive="true"]
+{
+    border: 2px dashed #2563EB;
+    background-color: #1B2436;
+}
+
+
+/* ==========================================================
+   Group Boxes
+   ========================================================== */
+
+QGroupBox
+{
+    background-color: #2A2A2D;
+
+    border: 1px solid #424248;
+    border-radius: 12px;
+
+    margin-top: 30px;
+    padding: 16px 14px 14px 14px;
+
+    font-weight: 600;
+    font-size: 13px;
+}
+
+QGroupBox::title
+{
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+
+    left: 2px;
+    top: 4px;
+
+    padding: 0px;
+
+    color: #F3F4F6;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/* ==========================================================
+   Scrollbars
+   ========================================================== */
+
+QScrollBar:vertical
+{
+    background: transparent;
+    width: 12px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical
+{
+    background: #4A4A4A;
+    border-radius: 6px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover
+{
+    background: #5C5C5C;
+}
+
+QScrollBar:horizontal
+{
+    background: transparent;
+    height: 12px;
+    margin: 2px;
+}
+
+QScrollBar::handle:horizontal
+{
+    background: #4A4A4A;
+    border-radius: 6px;
+    min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover
+{
+    background: #5C5C5C;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line
+{
+    width: 0px;
+    height: 0px;
+}
+
+
+/* ==========================================================
+   Tooltips
+   ========================================================== */
+
+QToolTip
+{
+    background-color: #2B2B2B;
+
     color: white;
 
-    border: 1px solid #3A3A3A;
-    border-radius: 10px;
+    border: 1px solid #4B4B4B;
 
-    margin-top: 12px;
-    padding-top: 12px;
+    padding: 6px 10px;
 
-    font-weight: bold;
+    border-radius: 6px;
 }
 
-QGroupBox::title {
-    left: 10px;
-    padding: 0px 4px;
+
+/* ==========================================================
+   Focus
+   ========================================================== */
+
+*:focus
+{
+    outline: none;
 }

@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>styles.qss</file>
+        <file>icons/archive.svg</file>
+        <file>icons/chart-column.svg</file>
+        <file>icons/circle-alert.svg</file>
+        <file>icons/circle-check.svg</file>
+        <file>icons/file.svg</file>
+        <file>icons/folder.svg</file>
+        <file>icons/folder-open.svg</file>
+        <file>icons/upload.svg</file>
     </qresource>
 </RCC>

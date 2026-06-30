@@ -21,7 +21,6 @@ public:
 private:
     void setSelectedFile(const QString &filePath);
     void updateButtons();
-    void updateButtonStyles();
 
     Ui::MainWindow *ui;
 

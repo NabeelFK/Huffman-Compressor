@@ -3,6 +3,8 @@
 
 #include <QFrame>
 #include <QString>
+#include <QResizeEvent>
+#include <QWidget>
 
 class DropFrame : public QFrame
 {
@@ -20,6 +22,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 };
 
 #endif // DROPFRAME_H

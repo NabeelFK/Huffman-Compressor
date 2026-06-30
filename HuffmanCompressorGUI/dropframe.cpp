@@ -5,6 +5,7 @@
 #include <QMimeData>
 #include <QUrl>
 #include <QFileInfo>
+#include <QResizeEvent>
 
 DropFrame::DropFrame(QWidget *parent)
     : QFrame(parent)
@@ -41,6 +42,23 @@ void DropFrame::dragEnterEvent(QDragEnterEvent *event)
         "background-color: rgba(59,130,246,40);"
         "}"
         );
+}
+
+void DropFrame::resizeEvent(QResizeEvent *event)
+{
+    QFrame::resizeEvent(event);
+
+    QWidget *content = findChild<QWidget*>("contentWidget");
+
+    if (!content)
+        return;
+
+    int x = (width() - content->width()) / 2;
+    int y = (height() - content->height()) / 2;
+
+    content->move(x, y);
+
+
 }
 
 void DropFrame::dragLeaveEvent(QDragLeaveEvent *)

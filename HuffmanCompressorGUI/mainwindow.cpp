@@ -9,6 +9,58 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QDir>
+#include <QLayout>
+#include <QIcon>
+#include <QSize>
+#include <QPainter>
+#include <QPixmap>
+
+namespace
+{
+// SVG icon assets are loaded with whatever color is baked into the
+// file (looks like a dark/black stroke), which is nearly invisible
+// on a dark theme. QSS can't recolor an already-rendered pixmap, so
+// we tint it ourselves at load time using SourceIn compositing
+// (keeps the icon's alpha shape, replaces all opaque pixels with
+// the requested color).
+QPixmap coloredPixmap(const QString &svgPath, const QSize &size, const QColor &color)
+{
+    QPixmap source = QIcon(svgPath).pixmap(size);
+
+    QPixmap result(source.size());
+
+    // QPixmap::size() returns physical pixel dimensions, which on a
+    // HiDPI screen are larger than the logical "size" we asked for
+    // (e.g. 27x27 physical for an 18x18 request at 150% scaling).
+    // A freshly constructed QPixmap defaults to devicePixelRatio 1.0,
+    // so without this line the result is mislabeled as a 27x27
+    // logical pixmap -- which is what was making icons look both
+    // blurry (Qt rescaling) and clipped (overflowing their 18x18 box).
+    result.setDevicePixelRatio(source.devicePixelRatio());
+
+    result.fill(Qt::transparent);
+
+    QPainter painter(&result);
+    painter.drawPixmap(0, 0, source);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(result.rect(), color);
+    painter.end();
+
+    return result;
+}
+
+QIcon coloredIcon(const QString &svgPath, const QSize &size, const QColor &color)
+{
+    return QIcon(coloredPixmap(svgPath, size, color));
+}
+
+// Light grey used for small badge icons sitting on dark pill
+// backgrounds (fileIcon / folderIcon / statsIcon / uploadIcon).
+const QColor kBadgeIconColor = QColor("#D4D4D8");
+
+// White used for icons that sit on solid blue buttons.
+const QColor kButtonIconColor = QColor("#FFFFFF");
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +68,50 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("Huffman Compressor");
+
+    ui->browseButton->setText("  Choose File");
+    ui->browseOutputButton->setText("  Browse");
+    ui->compressButton->setText("  Compress");
+    ui->decompressButton->setText("  Decompress");
+
+    ui->browseButton->setIcon(
+        coloredIcon(":/icons/file.svg", QSize(18, 18), kButtonIconColor)
+        );
+
+    ui->browseOutputButton->setIcon(
+        coloredIcon(":/icons/folder.svg", QSize(18, 18), kButtonIconColor)
+        );
+
+    ui->compressButton->setIcon(
+        coloredIcon(":/icons/archive.svg", QSize(18, 18), kButtonIconColor)
+        );
+
+    ui->decompressButton->setIcon(
+        coloredIcon(":/icons/folder-open.svg", QSize(18, 18), kButtonIconColor)
+        );
+
+    ui->uploadIcon->setPixmap(
+        coloredPixmap(":/icons/upload.svg", QSize(42, 42), kBadgeIconColor)
+        );
+
+    ui->fileIcon->setPixmap(
+        coloredPixmap(":/icons/file.svg", QSize(18, 18), kBadgeIconColor)
+        );
+
+    ui->statsIcon->setPixmap(
+        coloredPixmap(":/icons/chart-column.svg", QSize(18, 18), kBadgeIconColor)
+        );
+
+    ui->folderIcon->setPixmap(
+        coloredPixmap(":/icons/folder.svg", QSize(18, 18), kBadgeIconColor)
+        );
+
+    ui->uploadIcon->setAlignment(Qt::AlignCenter);
+
+    ui->browseButton->setIconSize(QSize(18, 18));
+    ui->browseOutputButton->setIconSize(QSize(18, 18));
+    ui->compressButton->setIconSize(QSize(18, 18));
+    ui->decompressButton->setIconSize(QSize(18, 18));
 
     DropFrame *dropFrame = qobject_cast<DropFrame*>(ui->dropFrame);
 
@@ -71,10 +167,12 @@ MainWindow::MainWindow(QWidget *parent)
     setAcceptDrops(true);
     updateButtons();
 
-    ui->browseOutputButton->hide();
-    ui->outputFolderLabel->hide();
-    ui->outputFolderPathLabel->hide();
-
+    // The output-folder row used to be hidden/shown with the checkbox,
+    // which collapsed/expanded the row's height and made everything
+    // below it jump. Instead, keep it always visible and just disable
+    // the Browse button when it isn't relevant -- nothing in the
+    // layout moves.
+    ui->browseOutputButton->setEnabled(false);
     outputFolderPath.clear();
 
     connect(
@@ -83,9 +181,7 @@ MainWindow::MainWindow(QWidget *parent)
         this,
         [this](bool checked)
         {
-            ui->browseOutputButton->setVisible(checked);
-            ui->outputFolderLabel->setVisible(checked);
-            ui->outputFolderPathLabel->setVisible(checked);
+            ui->browseOutputButton->setEnabled(checked);
 
             if (checked)
             {
@@ -97,6 +193,7 @@ MainWindow::MainWindow(QWidget *parent)
             else
             {
                 outputFolderPath.clear();
+                ui->outputFolderPathLabel->setText("Same as input folder");
             }
         }
         );
@@ -152,6 +249,13 @@ MainWindow::MainWindow(QWidget *parent)
             if (!folder.isEmpty())
             {
                 outputFolderPath = folder;
+
+                // outputFolderPathLabel is a read-only QLineEdit, so a
+                // long path isn't clipped -- the user can click in and
+                // scroll/select to see the rest of it. setText() also
+                // leaves the cursor at the end, which conveniently
+                // scrolls the view to show the final (most relevant)
+                // folder name first.
                 ui->outputFolderPathLabel->setText(folder);
             }
         }
@@ -397,8 +501,6 @@ void MainWindow::updateButtons()
         ui->compressButton->setEnabled(false);
         ui->decompressButton->setEnabled(false);
 
-        updateButtonStyles();
-
         return;
     }
 
@@ -410,42 +512,12 @@ void MainWindow::updateButtons()
     ui->compressButton->setEnabled(!isHuffman);
     ui->decompressButton->setEnabled(isHuffman);
 
-    updateButtonStyles();
+    // Enabled/disabled appearance now comes entirely from styles.qss
+    // (QPushButton:disabled), so there's no separate updateButtonStyles()
+    // call here anymore -- the old version set an inline stylesheet with
+    // smaller padding/radius than the rest of the app, which is why
+    // Compress/Decompress looked cramped compared to every other button.
 }
-
-void MainWindow::updateButtonStyles()
-{
-    const QString enabledStyle =
-        "QPushButton {"
-        "background-color:#2563EB;"
-        "color:white;"
-        "border-radius:6px;"
-        "padding:6px 12px;"
-        "}"
-        "QPushButton:hover {"
-        "background-color:#3B82F6;"
-        "}"
-        "QPushButton:pressed {"
-        "background-color:#1D4ED8;"
-        "}";
-
-    const QString disabledStyle =
-        "QPushButton {"
-        "background-color: #2F2F2F;"
-        "color: #8A8A8A;"
-        "border-radius: 6px;"
-        "padding: 6px 12px;"
-        "}";
-
-    ui->compressButton->setStyleSheet(
-        ui->compressButton->isEnabled() ? enabledStyle : disabledStyle
-        );
-
-    ui->decompressButton->setStyleSheet(
-        ui->decompressButton->isEnabled() ? enabledStyle : disabledStyle
-        );
-}
-
 
 MainWindow::~MainWindow()
 {
